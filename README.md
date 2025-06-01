@@ -8,9 +8,9 @@ The objective of this assignment is to implement a **Conditional GAN-based Text-
 2. **Target Generator** – Generates realistic images conditioned on the encoded features and input text descriptions.  
 3. **Discriminator** – Distinguishes between real and generated images.
 
-Unlike traditional GANs, the generator here is conditioned not only on random inputs but also on text and learned image representations. The source encoder replaces random noise with more structured inputs, allowing for better control and interpretability.
+Unlike traditional GANs, the generator here is conditioned not only on random inputs but also on text and learned image representations. The source encoder replaces random noise with more structured inputs for the generator. All components must be trained from scratch (no pretrained models or checkpoints).
 
-The system should be trained and tested on a randomly selected subset of 25 classes (20 train + 5 test) from the **Oxford-102 Flowers Dataset**, using textual descriptions from the provided [GitHub repository](https://github.com/taoxugit/AttnGAN/tree/master/data/flowers).
+The system should be trained and tested on a randomly selected subset of 25 classes (20 train + 5 test) from the **Oxford-102 Flowers Dataset**, using textual descriptions from the provided [GitHub repository](https://github.com/aelnouby/Text-to-Image-Synthesis?tab=readme-ov-file).
 
 Key requirements:
 - All models must be original (no transformers or diffusion models).
@@ -61,7 +61,7 @@ The assignment emphasizes model design, training methodology, and creativity in 
 
 ### Training Loop Diagram (Mermaid)
 
-mermaid
+```mermaid
 flowchart TD
 A[Start Epoch] --> B[Sample Batch (Image + Text)]
 B --> C[Encode Image to Latents + Content]
@@ -93,103 +93,139 @@ N -->|No| P[Continue]
 O --> Q[Evaluate (Optional)]
 P --> Q
 Q --> R[Next Epoch or Done]
-Loss Functions and Training Objectives
+````
+
+---
+
+## Loss Functions and Training Objectives
 
 Your training pipeline integrates multiple objectives for stable and semantically aligned generation. Below are the mathematical formulations for each:
 
-1. Hinge Loss
+---
 
-Discriminator Hinge Loss:
+### 1. Hinge Loss
 
-$$ \mathcal{L}D ;=; \mathbb{E}{x \sim p_{\text{real}}}\bigl[\max(0,, 1 - D(x))\bigr] ;+; \mathbb{E}{\hat{x} \sim p{\text{fake}}}\bigl[\max(0,, 1 + D(\hat{x}))\bigr] $$
+**Discriminator Hinge Loss**:
 
-Generator Hinge Loss:
+$$
+\mathcal{L}_D \;=\; \mathbb{E}_{x \sim p_{\text{real}}}\bigl[\max(0,\, 1 - D(x))\bigr] \;+\; \mathbb{E}_{\hat{x} \sim p_{\text{fake}}}\bigl[\max(0,\, 1 + D(\hat{x}))\bigr]
+$$
 
-$$ \mathcal{L}G ;=; -,\mathbb{E}{\hat{x} \sim p_{\text{fake}}}\bigl[D(\hat{x})\bigr] $$
+**Generator Hinge Loss**:
 
-2. Gradient Penalty (WGAN-GP-style)
+$$
+\mathcal{L}_G \;=\; -\,\mathbb{E}_{\hat{x} \sim p_{\text{fake}}}\bigl[D(\hat{x})\bigr]
+$$
+
+---
+
+### 2. Gradient Penalty (WGAN-GP-style)
 
 Enforces the Lipschitz constraint by penalizing gradients:
 
-$$ \mathcal{L}{\text{GP}} ;=; \lambda{\text{gp}} ,\cdot, \mathbb{E}{\tilde{x} \sim \mathbb{P}{\text{interp}}} \Bigl[\bigl(|\nabla_{\tilde{x}} D(\tilde{x})|_2 ;-; 1\bigr)^2\Bigr] $$
+$$
+\mathcal{L}_{\text{GP}} \;=\; \lambda_{\text{gp}} \,\cdot\, \mathbb{E}_{\tilde{x} \sim \mathbb{P}_{\text{interp}}} \Bigl[\bigl(\|\nabla_{\tilde{x}} D(\tilde{x})\|_2 \;-\; 1\bigr)^2\Bigr]
+$$
 
-Where 
-x
-~
-, a linear interpolation of real and fake images.
+Where $\tilde{x} = \alpha\,x + (1 - \alpha)\,\hat{x}$, a linear interpolation of real and fake images.
 
-3. Feature Matching Loss
+---
+
+### 3. Feature Matching Loss
 
 Matches intermediate discriminator features of real vs. generated images:
 
-$$ \mathcal{L}{\text{FM}} ;=; \sum{l} \bigl|,f_l(x) ;-; f_l(\hat{x})\bigr|_1 $$
+$$
+\mathcal{L}_{\text{FM}} \;=\; \sum_{l} \bigl\|\,f_l(x) \;-\; f_l(\hat{x})\bigr\|_1
+$$
 
-Where 
-f
-l
- are discriminator features at layer 
-l
-.
+Where $f_l$ are discriminator features at layer $l$.
 
-4. Contrastive Loss (Optional, Supervised)
+---
+
+### 4. Contrastive Loss (Optional, Supervised)
 
 Encourages similar latent vectors for same-class images:
 
-$$ \mathcal{L}{\text{contrastive}} ;=; \sum{i < j} \begin{cases} |,z_i - z_j|^2, & \text{if } y_i = y_j, \ \max\bigl(0,,m - |,z_i - z_j|\bigr)^2, & \text{if } y_i \neq y_j, \end{cases} $$
+$$
+\mathcal{L}_{\text{contrastive}} \;=\; \sum_{i < j}
+\begin{cases}
+\|\,z_i - z_j\|^2, & \text{if } y_i = y_j, \\
+\max\bigl(0,\,m - \|\,z_i - z_j\|\bigr)^2, & \text{if } y_i \neq y_j,
+\end{cases}
+$$
 
-Where 
-z
-i
- are latent embeddings, and 
-m
- is a margin hyperparameter.
+Where $z_i$ are latent embeddings, and $m$ is a margin hyperparameter.
 
-5. Reconstruction Loss (L1)
+---
+
+### 5. Reconstruction Loss (L1)
 
 Pixel-level reconstruction loss to align generated and real images:
 
-L
-recon
+$$
+\mathcal{L}_{\text{recon}} \;=\; \bigl\|\,\hat{x} - x\bigr\|_1
+$$
 
-Total Generator Loss
+---
 
-$$ \mathcal{L}{\text{G-total}} ;=; \mathcal{L}G ;+; \lambda{\text{FM}}\cdot \mathcal{L}{\text{FM}} ;+; \lambda_{\text{recon}}\cdot \mathcal{L}{\text{recon}} ;+; \lambda{\text{contrastive}}\cdot \mathcal{L}_{\text{contrastive}} $$
+### Total Generator Loss
 
-Notes
+$$
+\mathcal{L}_{\text{G-total}} \;=\; \mathcal{L}_G \;+\; \lambda_{\text{FM}}\cdot \mathcal{L}_{\text{FM}} \;+\; \lambda_{\text{recon}}\cdot \mathcal{L}_{\text{recon}} \;+\; \lambda_{\text{contrastive}}\cdot \mathcal{L}_{\text{contrastive}}
+$$
 
-λ
- values are tunable hyperparameters.
-Contrastive loss is used only when class labels are available.
-All loss components contribute to a balanced and stable training loop.
-Model Parameters
+---
 
-Model	Total Params	Trainable Params	Size (MB)
-0 Encoder	22,096,512	22,096,512	84.31
-1 Generator	3,534,115	3,534,115	13.52
-2 Discriminator	11,675,329	11,675,329	44.63
-Results
+### Notes
 
-image image image image image image image
+* $\lambda$ values are tunable hyperparameters.
+* Contrastive loss is used only when class labels are available.
+* All loss components contribute to a balanced and stable training loop.
 
-Inception Score: 2.1885813649477743 ± 0.09596595874708262
+---
 
-Quantitative Evaluation Metrics:
+## Model Parameters
 
-inception_score_mean: 2.1885813649477743
-inception_score_std: 0.09596595874708262
-frechet_inception_distance: 184.25644610545228
-References
+| Model           | Total Params | Trainable Params | Size (MB) |
+| --------------- | ------------ | ---------------- | --------- |
+| 0 Encoder       | 22,096,512   | 22,096,512       | 84.31     |
+| 1 Generator     | 3,534,115    | 3,534,115        | 13.52     |
+| 2 Discriminator | 11,675,329   | 11,675,329       | 44.63     |
 
-Miyato, T., et al. (2018). “Spectral Normalization for Generative Adversarial Networks.”
-Mirza, M., & Osindero, S. (2014). “Conditional Generative Adversarial Nets.”
-Brock, A., Donahue, J., & Simonyan, K. (2019). “Large Scale GAN Training for High Fidelity Natural Image Synthesis.”
-Karras, T., et al. (2019). “StyleGAN: A Style-Based Generator Architecture for Generative Adversarial Networks.”
-Karras, T., et al. (2020). “StyleGAN2: Analyzing and Improving the Image Quality of StyleGAN.”
-Miyato, T., & Koyama, M. (2018). “ProjGAN: Conditional Generative Adversarial Networks with Projection Discriminator.”
-Reed, S., et al. (2016). “Text-to-Image Generation with Deep Learning.”
-Tao, M., et al. (2020). “DF-GAN: A Simple and Effective Baseline for Text-to-Image Synthesis.”
-Lim, J. H., & Ye, J. C. (2017). “Geometric GAN.”
-Zhang, H., et al. (2019). “Self-Attention Generative Adversarial Networks.”
-Mescheder, L., et al. (2018). “Which Training Methods for GANs do actually Converge?”
-Gulrajani, I., et al. (2017). “Improved Training of Wasserstein GANs.”
-Karras, T., et al. (2018). “Progressive Growing of GANs for Improved Quality, Stability, and Variation.”
+---
+
+## Results
+
+![image](https://github.com/user-attachments/assets/e7a9c570-b056-4afc-b287-22a84511ef2b)
+![image](https://github.com/user-attachments/assets/945825a9-5efc-46cd-ba57-2255a67db423)
+![image](https://github.com/user-attachments/assets/e74d0e6c-92af-4e7c-a5aa-e6c5c78ca43e)
+![image](https://github.com/user-attachments/assets/ff5295e2-31be-4396-ba04-4f1352d637eb)
+![image](https://github.com/user-attachments/assets/a3533e3a-6e01-4b84-add4-97deaf8a0712)
+![image](https://github.com/user-attachments/assets/ce256461-ef71-4620-9346-c76fb657270e)
+![image](https://github.com/user-attachments/assets/f6e16abb-79f5-423c-b9a0-76c5d11ce208)
+
+* **Inception Score**: 2.1885813649477743 ± 0.09596595874708262
+* **Quantitative Evaluation Metrics**:
+
+  * inception\_score\_mean: 2.1885813649477743
+  * inception\_score\_std: 0.09596595874708262
+  * frechet\_inception\_distance: 184.25644610545228
+
+---
+
+## References
+
+1. Miyato, T., et al. (2018). “Spectral Normalization for Generative Adversarial Networks.”
+2. Mirza, M., & Osindero, S. (2014). “Conditional Generative Adversarial Nets.”
+3. Brock, A., Donahue, J., & Simonyan, K. (2019). “Large Scale GAN Training for High Fidelity Natural Image Synthesis.”
+4. Karras, T., et al. (2019). “StyleGAN: A Style-Based Generator Architecture for Generative Adversarial Networks.”
+5. Karras, T., et al. (2020). “StyleGAN2: Analyzing and Improving the Image Quality of StyleGAN.”
+6. Miyato, T., & Koyama, M. (2018). “ProjGAN: Conditional Generative Adversarial Networks with Projection Discriminator.”
+7. Reed, S., et al. (2016). “Text-to-Image Generation with Deep Learning.”
+8. Tao, M., et al. (2020). “DF-GAN: A Simple and Effective Baseline for Text-to-Image Synthesis.”
+9. Lim, J. H., & Ye, J. C. (2017). “Geometric GAN.”
+10. Zhang, H., et al. (2019). “Self-Attention Generative Adversarial Networks.”
+11. Mescheder, L., et al. (2018). “Which Training Methods for GANs do actually Converge?”
+12. Gulrajani, I., et al. (2017). “Improved Training of Wasserstein GANs.”
+13. Karras, T., et al. (2018). “Progressive Growing of GANs for Improved Quality, Stability, and Variation.”
