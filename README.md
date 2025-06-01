@@ -103,11 +103,11 @@ Your training pipeline integrates multiple objectives for stable and semanticall
 
 **Discriminator Hinge Loss**:
 
-![Discriminator Hinge Loss](https://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D_D%20%3D%20%5Cmathbb%7BE%7D_%7Bx%20%5Csim%20p_%7B%5Ctext%7Breal%7D%7D%7D%5B%5Cmax(0%2C%201%20-%20D(x))%5D%20%2B%20%5Cmathbb%7BE%7D_%7B%5Chat%7Bx%7D%20%5Csim%20p_%7B%5Ctext%7Bfake%7D%7D%7D%5B%5Cmax(0%2C%201%20%2B%20D(%5Chat%7Bx%7D))%5D)
+![Discriminator Hinge Loss](https://latex.codecogs.com/svg.latex?%5Ccolor%7Bwhite%7D%5Cmathcal%7BL%7D_D%20%3D%20%5Cmathbb%7BE%7D_%7Bx%20%5Csim%20p_%7B%5Ctext%7Breal%7D%7D%7D%5B%5Cmax(0%2C%201%20-%20D(x))%5D%20%2B%20%5Cmathbb%7BE%7D_%7B%5Chat%7Bx%7D%20%5Csim%20p_%7B%5Ctext%7Bfake%7D%7D%7D%5B%5Cmax(0%2C%201%20%2B%20D(%5Chat%7Bx%7D))%5D)
 
 **Generator Hinge Loss**:
 
-![Generator Hinge Loss](https://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D_G%20%3D%20-%5Cmathbb%7BE%7D_%7B%5Chat%7Bx%7D%20%5Csim%20p_%7B%5Ctext%7Bfake%7D%7D%7D%5BD(%5Chat%7Bx%7D)%5D)
+![Generator Hinge Loss](https://latex.codecogs.com/svg.latex?%5Ccolor%7Bwhite%7D%5Cmathcal%7BL%7D_G%20%3D%20-%5Cmathbb%7BE%7D_%7B%5Chat%7Bx%7D%20%5Csim%20p_%7B%5Ctext%7Bfake%7D%7D%7D%5BD(%5Chat%7Bx%7D)%5D)
 
 ---
 
@@ -115,9 +115,9 @@ Your training pipeline integrates multiple objectives for stable and semanticall
 
 Enforces the Lipschitz constraint by penalizing gradients:
 
-![Gradient Penalty](https://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D_%7B%5Ctext%7BGP%7D%7D%20%3D%20%5Clambda_%7B%5Ctext%7Bgp%7D%7D%20%5Ccdot%20%5Cmathbb%7BE%7D_%7B%5Ctilde%7Bx%7D%20%5Csim%20%5Cmathbb%7BP%7D_%7B%5Ctext%7Binterp%7D%7D%7D%20%5Cleft%5B%20%5Cleft(%20%5C%7C%5Cnabla_%7B%5Ctilde%7Bx%7D%7D%20D(%5Ctilde%7Bx%7D)%5C%7C_2%20-%201%20%5Cright)%5E2%20%5Cright%5D)
+![Gradient Penalty](https://latex.codecogs.com/svg.latex?%5Ccolor%7Bwhite%7D%5Cmathcal%7BL%7D_%7B%5Ctext%7BGP%7D%7D%20%3D%20%5Clambda_%7B%5Ctext%7Bgp%7D%7D%20%5Ccdot%20%5Cmathbb%7BE%7D_%7B%5Ctilde%7Bx%7D%20%5Csim%20%5Cmathbb%7BP%7D_%7B%5Ctext%7Binterp%7D%7D%7D%20%5Cleft%5B%20%5Cleft(%20%5C%7C%5Cnabla_%7B%5Ctilde%7Bx%7D%7D%20D(%5Ctilde%7Bx%7D)%5C%7C_2%20-%201%20%5Cright)%5E2%20%5Cright%5D)
 
-Where ![interpolation](https://latex.codecogs.com/svg.latex?%5Ctilde%7Bx%7D%20%3D%20%5Calpha%20x%20%2B%20(1%20-%20%5Calpha)%5Chat%7Bx%7D), a linear interpolation of real and fake images.
+Where ![interpolation](https://latex.codecogs.com/svg.latex?%5Ccolor%7Bwhite%7D%5Ctilde%7Bx%7D%20%3D%20%5Calpha%20x%20%2B%20(1%20-%20%5Calpha)%5Chat%7Bx%7D), a linear interpolation of real and fake images.
 
 ---
 
@@ -125,9 +125,9 @@ Where ![interpolation](https://latex.codecogs.com/svg.latex?%5Ctilde%7Bx%7D%20%3
 
 Matches intermediate discriminator features of real vs. generated images:
 
-![Feature Matching Loss](https://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D_%7B%5Ctext%7BFM%7D%7D%20%3D%20%5Csum_%7Bl%7D%20%5C%7C%20f_l(x)%20-%20f_l(%5Chat%7Bx%7D)%20%5C%7C_1)
+![Feature Matching Loss](https://latex.codecogs.com/svg.latex?%5Ccolor%7Bwhite%7D%5Cmathcal%7BL%7D_%7B%5Ctext%7BFM%7D%7D%20%3D%20%5Csum_%7Bl%7D%20%5C%7C%20f_l(x)%20-%20f_l(%5Chat%7Bx%7D)%20%5C%7C_1)
 
-Where ![feature notation](https://latex.codecogs.com/svg.latex?f_l) are discriminator features at layer ![layer notation](https://latex.codecogs.com/svg.latex?l).
+Where ![feature notation](https://latex.codecogs.com/svg.latex?%5Ccolor%7Bwhite%7Df_l) are discriminator features at layer ![layer notation](https://latex.codecogs.com/svg.latex?%5Ccolor%7Bwhite%7Dl).
 
 ---
 
@@ -135,9 +135,9 @@ Where ![feature notation](https://latex.codecogs.com/svg.latex?f_l) are discrimi
 
 Encourages similar latent vectors for same-class images:
 
-![Contrastive Loss](https://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D_%7B%5Ctext%7Bcontrastive%7D%7D%20%3D%20%5Csum_%7Bi%20%3C%20j%7D%20%5Cbegin%7Bcases%7D%20%5C%7Cz_i%20-%20z_j%5C%7C%5E2%2C%20%26%20%5Ctext%7Bif%20%7D%20y_i%20%3D%20y_j%20%5C%5C%20%5Cmax(0%2C%20m%20-%20%5C%7Cz_i%20-%20z_j%5C%7C)%5E2%2C%20%26%20%5Ctext%7Bif%20%7D%20y_i%20%5Cneq%20y_j%20%5Cend%7Bcases%7D)
+![Contrastive Loss](https://latex.codecogs.com/svg.latex?%5Ccolor%7Bwhite%7D%5Cmathcal%7BL%7D_%7B%5Ctext%7Bcontrastive%7D%7D%20%3D%20%5Csum_%7Bi%20%3C%20j%7D%20%5Cbegin%7Bcases%7D%20%5C%7Cz_i%20-%20z_j%5C%7C%5E2%2C%20%26%20%5Ctext%7Bif%20%7D%20y_i%20%3D%20y_j%20%5C%5C%20%5Cmax(0%2C%20m%20-%20%5C%7Cz_i%20-%20z_j%5C%7C)%5E2%2C%20%26%20%5Ctext%7Bif%20%7D%20y_i%20%5Cneq%20y_j%20%5Cend%7Bcases%7D)
 
-Where ![latent notation](https://latex.codecogs.com/svg.latex?z_i) are latent embeddings, and ![margin notation](https://latex.codecogs.com/svg.latex?m) is a margin hyperparameter.
+Where ![latent notation](https://latex.codecogs.com/svg.latex?%5Ccolor%7Bwhite%7Dz_i) are latent embeddings, and ![margin notation](https://latex.codecogs.com/svg.latex?%5Ccolor%7Bwhite%7Dm) is a margin hyperparameter.
 
 ---
 
@@ -145,19 +145,19 @@ Where ![latent notation](https://latex.codecogs.com/svg.latex?z_i) are latent em
 
 Pixel-level reconstruction loss to align generated and real images:
 
-![Reconstruction Loss](https://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D_%7B%5Ctext%7Brecon%7D%7D%20%3D%20%5C%7C%20%5Chat%7Bx%7D%20-%20x%20%5C%7C_1)
+![Reconstruction Loss](https://latex.codecogs.com/svg.latex?%5Ccolor%7Bwhite%7D%5Cmathcal%7BL%7D_%7B%5Ctext%7Brecon%7D%7D%20%3D%20%5C%7C%20%5Chat%7Bx%7D%20-%20x%20%5C%7C_1)
 
 ---
 
 ### 📋 Total Generator Loss
 
-![Total Generator Loss](https://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D_%7B%5Ctext%7BG-total%7D%7D%20%3D%20%5Cmathcal%7BL%7D_G%20%2B%20%5Clambda_%7B%5Ctext%7BFM%7D%7D%20%5Ccdot%20%5Cmathcal%7BL%7D_%7B%5Ctext%7BFM%7D%7D%20%2B%20%5Clambda_%7B%5Ctext%7Brecon%7D%7D%20%5Ccdot%20%5Cmathcal%7BL%7D_%7B%5Ctext%7Brecon%7D%7D%20%2B%20%5Clambda_%7B%5Ctext%7Bcontrastive%7D%7D%20%5Ccdot%20%5Cmathcal%7BL%7D_%7B%5Ctext%7Bcontrastive%7D%7D)
+![Total Generator Loss](https://latex.codecogs.com/svg.latex?%5Ccolor%7Bwhite%7D%5Cmathcal%7BL%7D_%7B%5Ctext%7BG-total%7D%7D%20%3D%20%5Cmathcal%7BL%7D_G%20%2B%20%5Clambda_%7B%5Ctext%7BFM%7D%7D%20%5Ccdot%20%5Cmathcal%7BL%7D_%7B%5Ctext%7BFM%7D%7D%20%2B%20%5Clambda_%7B%5Ctext%7Brecon%7D%7D%20%5Ccdot%20%5Cmathcal%7BL%7D_%7B%5Ctext%7Brecon%7D%7D%20%2B%20%5Clambda_%7B%5Ctext%7Bcontrastive%7D%7D%20%5Ccdot%20%5Cmathcal%7BL%7D_%7B%5Ctext%7Bcontrastive%7D%7D)
 
 ---
 
 ### 📝 Notes
 
-- ![lambda notation](https://latex.codecogs.com/svg.latex?%5Clambda) values are tunable hyperparameters.
+- ![lambda notation](https://latex.codecogs.com/svg.latex?%5Ccolor%7Bwhite%7D%5Clambda) values are tunable hyperparameters.
 - Contrastive loss is used only when class labels are available.
 - All loss components contribute to a balanced and stable training loop.
 
