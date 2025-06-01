@@ -43,7 +43,7 @@ The assignment emphasizes model design, training methodology, and creativity in 
 - 🎯 **Spectral Normalization**: Stabilizes training by controlling Lipschitz continuity of conv layers.  
 - 📝 **Text-Image Matching**: Projects text into the discriminator space to enforce semantic alignment.
 
-![image](https://github.com/user-attachments/assets/47776a65-b795-4fa3-ab96-6df9121fb97b)
+![Architecture Overview](https://github.com/user-attachments/assets/47776a65-b795-4fa3-ab96-6df9121fb97b)
 
 ## Training Strategy
 
@@ -91,7 +91,7 @@ flowchart TD
     Q --> R[Next Epoch or Done]
 ```
 
-![image](https://github.com/user-attachments/assets/9e1b7c91-f9ef-491b-905d-b59e6b40cb38)
+![Training Flow](https://github.com/user-attachments/assets/9e1b7c91-f9ef-491b-905d-b59e6b40cb38)
 
 ## Loss Functions and Training Objectives
 
@@ -103,11 +103,11 @@ Your training pipeline integrates multiple objectives for stable and semanticall
 
 **Discriminator Hinge Loss**:
 
-$$\mathcal{L}_D = \mathbb{E}_{x \sim p_{\text{real}}}[\max(0, 1 - D(x))] + \mathbb{E}_{\hat{x} \sim p_{\text{fake}}}[\max(0, 1 + D(\hat{x}))]$$
+![Discriminator Hinge Loss](https://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D_D%20%3D%20%5Cmathbb%7BE%7D_%7Bx%20%5Csim%20p_%7B%5Ctext%7Breal%7D%7D%7D%5B%5Cmax(0%2C%201%20-%20D(x))%5D%20%2B%20%5Cmathbb%7BE%7D_%7B%5Chat%7Bx%7D%20%5Csim%20p_%7B%5Ctext%7Bfake%7D%7D%7D%5B%5Cmax(0%2C%201%20%2B%20D(%5Chat%7Bx%7D))%5D)
 
 **Generator Hinge Loss**:
 
-$$\mathcal{L}_G = -\mathbb{E}_{\hat{x} \sim p_{\text{fake}}}[D(\hat{x})]$$
+![Generator Hinge Loss](https://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D_G%20%3D%20-%5Cmathbb%7BE%7D_%7B%5Chat%7Bx%7D%20%5Csim%20p_%7B%5Ctext%7Bfake%7D%7D%7D%5BD(%5Chat%7Bx%7D)%5D)
 
 ---
 
@@ -115,9 +115,9 @@ $$\mathcal{L}_G = -\mathbb{E}_{\hat{x} \sim p_{\text{fake}}}[D(\hat{x})]$$
 
 Enforces the Lipschitz constraint by penalizing gradients:
 
-$$\mathcal{L}_{\text{GP}} = \lambda_{\text{gp}} \cdot \mathbb{E}_{\tilde{x} \sim \mathbb{P}_{\text{interp}}} \left[ \left( \|\nabla_{\tilde{x}} D(\tilde{x})\|_2 - 1 \right)^2 \right]$$
+![Gradient Penalty](https://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D_%7B%5Ctext%7BGP%7D%7D%20%3D%20%5Clambda_%7B%5Ctext%7Bgp%7D%7D%20%5Ccdot%20%5Cmathbb%7BE%7D_%7B%5Ctilde%7Bx%7D%20%5Csim%20%5Cmathbb%7BP%7D_%7B%5Ctext%7Binterp%7D%7D%7D%20%5Cleft%5B%20%5Cleft(%20%5C%7C%5Cnabla_%7B%5Ctilde%7Bx%7D%7D%20D(%5Ctilde%7Bx%7D)%5C%7C_2%20-%201%20%5Cright)%5E2%20%5Cright%5D)
 
-Where $\tilde{x} = \alpha x + (1 - \alpha)\hat{x}$, a linear interpolation of real and fake images.
+Where ![interpolation](https://latex.codecogs.com/svg.latex?%5Ctilde%7Bx%7D%20%3D%20%5Calpha%20x%20%2B%20(1%20-%20%5Calpha)%5Chat%7Bx%7D), a linear interpolation of real and fake images.
 
 ---
 
@@ -125,9 +125,9 @@ Where $\tilde{x} = \alpha x + (1 - \alpha)\hat{x}$, a linear interpolation of re
 
 Matches intermediate discriminator features of real vs. generated images:
 
-$$\mathcal{L}_{\text{FM}} = \sum_{l} \| f_l(x) - f_l(\hat{x}) \|_1$$
+![Feature Matching Loss](https://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D_%7B%5Ctext%7BFM%7D%7D%20%3D%20%5Csum_%7Bl%7D%20%5C%7C%20f_l(x)%20-%20f_l(%5Chat%7Bx%7D)%20%5C%7C_1)
 
-Where $f_l$ are discriminator features at layer $l$.
+Where ![feature notation](https://latex.codecogs.com/svg.latex?f_l) are discriminator features at layer ![layer notation](https://latex.codecogs.com/svg.latex?l).
 
 ---
 
@@ -135,13 +135,9 @@ Where $f_l$ are discriminator features at layer $l$.
 
 Encourages similar latent vectors for same-class images:
 
-$$\mathcal{L}_{\text{contrastive}} = \sum_{i < j}
-\begin{cases}
-\|z_i - z_j\|^2, & \text{if } y_i = y_j \\
-\max(0, m - \|z_i - z_j\|)^2, & \text{if } y_i \neq y_j
-\end{cases}$$
+![Contrastive Loss](https://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D_%7B%5Ctext%7Bcontrastive%7D%7D%20%3D%20%5Csum_%7Bi%20%3C%20j%7D%20%5Cbegin%7Bcases%7D%20%5C%7Cz_i%20-%20z_j%5C%7C%5E2%2C%20%26%20%5Ctext%7Bif%20%7D%20y_i%20%3D%20y_j%20%5C%5C%20%5Cmax(0%2C%20m%20-%20%5C%7Cz_i%20-%20z_j%5C%7C)%5E2%2C%20%26%20%5Ctext%7Bif%20%7D%20y_i%20%5Cneq%20y_j%20%5Cend%7Bcases%7D)
 
-Where $z_i$ are latent embeddings, and $m$ is a margin hyperparameter.
+Where ![latent notation](https://latex.codecogs.com/svg.latex?z_i) are latent embeddings, and ![margin notation](https://latex.codecogs.com/svg.latex?m) is a margin hyperparameter.
 
 ---
 
@@ -149,19 +145,19 @@ Where $z_i$ are latent embeddings, and $m$ is a margin hyperparameter.
 
 Pixel-level reconstruction loss to align generated and real images:
 
-$$\mathcal{L}_{\text{recon}} = \| \hat{x} - x \|_1$$
+![Reconstruction Loss](https://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D_%7B%5Ctext%7Brecon%7D%7D%20%3D%20%5C%7C%20%5Chat%7Bx%7D%20-%20x%20%5C%7C_1)
 
 ---
 
 ### 📋 Total Generator Loss
 
-$$\mathcal{L}_{\text{G-total}} = \mathcal{L}_G + \lambda_{\text{FM}} \cdot \mathcal{L}_{\text{FM}} + \lambda_{\text{recon}} \cdot \mathcal{L}_{\text{recon}} + \lambda_{\text{contrastive}} \cdot \mathcal{L}_{\text{contrastive}}$$
+![Total Generator Loss](https://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D_%7B%5Ctext%7BG-total%7D%7D%20%3D%20%5Cmathcal%7BL%7D_G%20%2B%20%5Clambda_%7B%5Ctext%7BFM%7D%7D%20%5Ccdot%20%5Cmathcal%7BL%7D_%7B%5Ctext%7BFM%7D%7D%20%2B%20%5Clambda_%7B%5Ctext%7Brecon%7D%7D%20%5Ccdot%20%5Cmathcal%7BL%7D_%7B%5Ctext%7Brecon%7D%7D%20%2B%20%5Clambda_%7B%5Ctext%7Bcontrastive%7D%7D%20%5Ccdot%20%5Cmathcal%7BL%7D_%7B%5Ctext%7Bcontrastive%7D%7D)
 
 ---
 
 ### 📝 Notes
 
-- $\lambda$ values are tunable hyperparameters.
+- ![lambda notation](https://latex.codecogs.com/svg.latex?%5Clambda) values are tunable hyperparameters.
 - Contrastive loss is used only when class labels are available.
 - All loss components contribute to a balanced and stable training loop.
 
@@ -175,19 +171,19 @@ $$\mathcal{L}_{\text{G-total}} = \mathcal{L}_G + \lambda_{\text{FM}} \cdot \math
 
 ## Results
 
-![image](https://github.com/user-attachments/assets/e7a9c570-b056-4afc-b287-22a84511ef2b)
+![Result 1](https://github.com/user-attachments/assets/e7a9c570-b056-4afc-b287-22a84511ef2b)
 
-![image](https://github.com/user-attachments/assets/945825a9-5efc-46cd-ba57-2255a67db423)
+![Result 2](https://github.com/user-attachments/assets/945825a9-5efc-46cd-ba57-2255a67db423)
 
-![image](https://github.com/user-attachments/assets/e74d0e6c-92af-4e7c-a5aa-e6c5c78ca43e)
+![Result 3](https://github.com/user-attachments/assets/e74d0e6c-92af-4e7c-a5aa-e6c5c78ca43e)
 
-![image](https://github.com/user-attachments/assets/ff5295e2-31be-4396-ba04-4f1352d637eb)
+![Result 4](https://github.com/user-attachments/assets/ff5295e2-31be-4396-ba04-4f1352d637eb)
 
-![image](https://github.com/user-attachments/assets/ff5295e2-31be-4396-ba04-4f1352d637eb)
+![Result 5](https://github.com/user-attachments/assets/ff5295e2-31be-4396-ba04-4f1352d637eb)
 
-![image](https://github.com/user-attachments/assets/ce256461-ef71-4620-9346-c76fb657270e)
+![Result 6](https://github.com/user-attachments/assets/ce256461-ef71-4620-9346-c76fb657270e)
 
-![image](https://github.com/user-attachments/assets/f6e16abb-79f5-423c-b9a0-76c5d11ce208)
+![Result 7](https://github.com/user-attachments/assets/f6e16abb-79f5-423c-b9a0-76c5d11ce208)
 
 ### Quantitative Evaluation Metrics:
 
